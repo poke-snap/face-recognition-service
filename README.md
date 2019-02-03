@@ -1,2 +1,2 @@
 # face-recognition-service
-Facial Recognition Servic
+Facial Recognition Service

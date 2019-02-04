@@ -30,7 +30,7 @@ class FaceRecognition(Resource):
         face_image = args['image']
         face_image.save('temp.jpg')
 
-        # matching_user = verify_face('temp.jpg')
+        matching_user = verify_face('temp.jpg')
         # f = open('temp.jpg', 'w')
         # f.write(face_image)
         # audioFile.save("image.jpg")

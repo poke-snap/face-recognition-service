@@ -2,10 +2,14 @@ from PIL import Image
 import face_recognition
 
 
-def verify_face(face_image):
-    sean_verify_image = face_recognition.load_image_file(face_image)
-    face_locations = face_recognition.face_locations(sean_verify_image)
-    face_encodings = face_recognition.face_encodings(sean_verify_image, face_locations)
+def load_face_model():
+    
+def verify_face(face_image_path):
+
+
+    face_image = face_recognition.load_image_file(face_image_path)
+    face_locations = face_recognition.face_locations(face_image)
+    face_encodings = face_recognition.face_encodings(face_image, face_locations)
 
     for face_encoding in face_encodings:
         # See if the face is a match for the known face(s)
@@ -19,7 +23,7 @@ def verify_face(face_image):
             return name
     return name
 
-    
+
 # Load the jpg file into a numpy array
 herman_image = face_recognition.load_image_file("herman.png")
 sean_image = face_recognition.load_image_file('sean.jpg')

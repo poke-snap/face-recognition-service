@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 import werkzeug
 
-# from verify_face import verify_face
+from verify_face import verify_face
 
 
 app = Flask(__name__)
@@ -31,6 +31,7 @@ class FaceRecognition(Resource):
         face_image.save('temp.jpg')
 
         matching_user = verify_face('temp.jpg')
+        return matching_user
         # f = open('temp.jpg', 'w')
         # f.write(face_image)
         # audioFile.save("image.jpg")

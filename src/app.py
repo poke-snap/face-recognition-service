@@ -1,3 +1,4 @@
+import os
 from os import listdir
 from os.path import isfile, join, splitext
 
@@ -59,7 +60,7 @@ def web_faces():
 if __name__ == "__main__":
     print("Starting by generating encodings for found images...")
     # Calculate known faces
-    faces_dict = images.get_faces_dict("test_images")
+    faces_dict = images.get_faces_dict(os.getenv('FACE_RECOGNITION_SERVICE_IMAGE_FILES', 'test_images'))
 
     # Start app
     print("Starting WebServer...")

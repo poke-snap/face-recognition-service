@@ -57,7 +57,7 @@ RUN cd ~ && \
 
 # # Copy web service script
 # COPY facerec_service.py /root/facerec_service.py
-
+ENV FACE_RECOGNITION_SERVICE_IMAGE_FILES="/app/test_images"
 
 # Start the web service
 CMD cd /app/ && \

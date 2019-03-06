@@ -35,6 +35,11 @@ def web_recognize():
 
 @app.route('/faces', methods=['GET', 'POST', 'DELETE'])
 def web_faces():
+    """REST API to add / retrieve faces
+
+    Example:
+    curl -X POST -F file=@<filename> <hostname>:<port>/faces?id=<id>
+    """
     # GET
     if request.method == 'GET':
         return jsonify(list(faces_dict.keys()))

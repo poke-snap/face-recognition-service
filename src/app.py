@@ -1,47 +1,72 @@
-from flask import Flask
-from flask_restful import Resource, Api, reqparse
-import werkzeug
+import os
+from os import listdir
+from os.path import isfile, join, splitext
 
-from verify_face import verify_face
+import face_recognition
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from werkzeug.exceptions import BadRequest
 
+from processing import images
 
+# Global storage for images
+faces_dict = {}
+
+# Create flask app
 app = Flask(__name__)
-api = Api(app)
-
-# parser = reqparse.RequestParser()
-# parser.add_argument('face')
-
-class FaceRecognition(Resource):
-
-    def get(self):
-        pass
-        # parse = reqparse.RequestParser()
-        # parse.add_argument('image', type=werkzeug.datastructures.FileStorage, location='files')
-        # args = parse.parse_args()
-        # print(args)
-        # audioFile = args['image']
-        # print(audioFile)
-        # return {'hello': 'world'}
-    
-    def post(self):
-        parse = reqparse.RequestParser()
-        parse.add_argument('image', type=werkzeug.datastructures.FileStorage, location='files')
-        args = parse.parse_args()
-        face_image = args['image']
-        face_image.save('temp.jpg')
-
-        matching_user = verify_face('temp.jpg')
-        return matching_user
-        # f = open('temp.jpg', 'w')
-        # f.write(face_image)
-        # audioFile.save("image.jpg")
+CORS(app)
 
 
-##
-## Actually setup the Api resource routing here
-##
-api.add_resource(FaceRecognition, '/')
+@app.route('/', methods=['POST'])
+def web_recognize():
+    """REST API to add new image to the server
+
+    Example:
+    curl -X POST -F file=@<filename> <hostname>:<port> 
+    """
+    file = images.extract_image(request)
+
+    if file and images.is_picture(file.filename):
+        # The image file seems valid! Detect faces and return the result.
+        return jsonify(images.detect_faces_in_image(file, faces_dict))
+    else:
+        raise BadRequest("Given file is invalid!")
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/faces', methods=['GET', 'POST', 'DELETE'])
+def web_faces():
+    """REST API to add / retrieve faces
+
+    Example:
+    curl -X POST -F file=@<filename> <hostname>:<port>/faces?id=<id>
+    """
+    # GET
+    if request.method == 'GET':
+        return jsonify(list(faces_dict.keys()))
+
+    # POST/DELETE
+    file = images.extract_image(request)
+    if 'id' not in request.args:
+        raise BadRequest("Identifier for the face was not given!")
+
+    if request.method == 'POST':
+        try:
+            new_encoding = images.calc_face_encoding(file)
+            faces_dict.update({request.args.get('id'): new_encoding})
+        except Exception as exception:
+            raise BadRequest(exception)
+
+    elif request.method == 'DELETE':
+        faces_dict.pop(request.args.get('id'))
+
+    return jsonify(list(faces_dict.keys()))
+
+
+if __name__ == "__main__":
+    print("Starting by generating encodings for found images...")
+    # Calculate known faces
+    faces_dict = images.get_faces_dict(os.getenv('FACE_RECOGNITION_SERVICE_IMAGE_FILES', 'test_images'))
+
+    # Start app
+    print("Starting WebServer...")
+    app.run(host='0.0.0.0', port=8080, debug=False)

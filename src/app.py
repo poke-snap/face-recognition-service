@@ -9,12 +9,16 @@ from werkzeug.exceptions import BadRequest
 
 from processing import images
 
+import boto3
+
 # Global storage for images
 faces_dict = {}
 
 # Create flask app
 app = Flask(__name__)
 CORS(app)
+
+client = boto3.client('dynamodb')
 
 
 @app.route('/', methods=['POST'])

@@ -1,2 +1,5 @@
-# face-recognition-service
-Facial Recognition Service
+# Face Recognition Service
+
+
+# Technologies and Frameworks
+- 
